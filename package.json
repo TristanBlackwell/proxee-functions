@@ -5,7 +5,7 @@
   "scripts": {
     "test": "tsc --noEmit",
     "start": "twilio-run --functions-folder dist/functions --assets-folder dist/assets",
-    "deploy": "twilio-run deploy --username ${TWILIO_API_KEY} --password ${TWILIO_API_SECRET} --environment=dev --functions-folder dist/functions --assets-folder dist/assets",
+    "deploy": "twilio-run deploy --username ${TWILIO_API_KEY} --password ${TWILIO_API_SECRET} --environment=dev --override-existing-project --functions-folder dist/functions --assets-folder dist/assets",
     "promote": "twilio-run promote --source-environment=dev --environment=prod",
     "build": "tsc && npm run build:copy-assets",
     "build:copy-assets": "copyfiles src/assets/* src/assets/**/* --up 2 --exclude **/*.ts dist/assets/",
