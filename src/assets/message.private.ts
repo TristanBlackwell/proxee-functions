@@ -1,3 +1,1 @@
-export const privateMessage = () => {
-  return 'This is private!';
-};
+export const privateMessage = () => "This is private!";
