@@ -1,0 +1,18 @@
+name: Deploy Serverless
+on:
+  workflow_call:
+    secrets:
+      TWILIO_ACCOUNT_SID:
+        required: true
+      TWILIO_API_KEY:
+        required: true
+      TWILIO_API_SECRET:
+        required: true
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: ""
