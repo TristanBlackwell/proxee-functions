@@ -10,14 +10,17 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
   event,
   callback
 ) => {
+  const twiml = new Twilio.twiml.VoiceResponse();
+
   const proxyPhoneNumber = context.PROXY_PHONE_NUMBER;
   if (!proxyPhoneNumber) {
-    return callback("No proxy number has been set for Proxee.");
+    twiml.say(
+      "Your proxy number has not yet been configured. Please set this up to continue."
+    );
+    return callback(null, twiml);
   }
 
   const phoneNumberToCall = event.Digits;
-
-  const twiml = new Twilio.twiml.VoiceResponse();
 
   twiml.say(`Starting call to ${phoneNumberToCall.split("").join(" ")}`);
 

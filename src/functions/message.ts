@@ -53,7 +53,7 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
         // eslint-disable-next-line no-console
         console.error(error);
         twiml.message(
-          "An error occurred, check the Twilio Console for more details."
+          "An error occurred sending your message. Check the Twilio Console for more details."
         );
         return callback(error, twiml);
       });
