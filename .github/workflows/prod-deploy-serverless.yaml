@@ -17,11 +17,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download Service SID artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: service-sid
-          path: ./service-sid.txt
+      - name: Download Artifact
+        run: |
+          # Fetch the latest artifact URL from a previous workflow run
+          ARTIFACT_URL=$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/actions/runs?event=push&status=success" | \
+                        jq -r '.workflow_runs[0].artifacts_url')
+
+          # Download the artifact
+          curl -s -L -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+              "$(curl -s -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+                "$ARTIFACT_URL" | \
+                jq -r '.artifacts[0].archive_download_url')?$(date +%s)" \
+              --output service-sid.txt
 
       - name: Setup Twilio CLI and promote environment
         env:
