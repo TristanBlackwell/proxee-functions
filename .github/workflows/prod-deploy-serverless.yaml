@@ -20,6 +20,7 @@ jobs:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v2
         with:
+          github_token: ${{ secrets.GH_TOKEN }}
           path: ./service-sid.txt
 
       - name: Setup Twilio CLI and promote environment
