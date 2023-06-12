@@ -22,4 +22,13 @@ jobs:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
           TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
-        run: npm install -g twilio-cli && twilio plugins:install @twilio-labs/plugin-serverless && npm run deploy > deploy-output.txt && grep -o -m1 '\ZS\w*' deploy-output.txt > service-sid.txt && cat service-sid.txt
+        run: npm install -g twilio-cli && twilio plugins:install @twilio-labs/plugin-serverless && npm run deploy > deploy-output.txt
+
+      - name: Save Service SID to file
+        run: grep -o -m1 '\ZS\w*' deploy-output.txt > service-sid.txt
+
+      - name: Save Service SID artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: service-sid
+          path: ./service-sid.txt
