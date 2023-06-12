@@ -22,7 +22,6 @@ jobs:
         with:
           github_token: ${{ secrets.GH_TOKEN }}
           workflow: dev-deploy-serverless.yaml
-          path: ./service-sid.txt
 
       - name: Setup Twilio CLI and promote environment
         env:
