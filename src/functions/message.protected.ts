@@ -27,7 +27,9 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
   const body = event.Body;
 
   if (event.From === privatePhoneNumber) {
+    console.log("Message received from private number.");
     if (!body.toLowerCase().startsWith("to ")) {
+      console.log("Incorrect formatting, informing user.");
       twiml.message(
         'Please start your text with "To [phone-number]:" followed by your message'
       );
@@ -38,6 +40,10 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
     const targetPhoneNumber = body.substring(3, body.indexOf(":"));
     const targetMessage = body.substring(body.indexOf(":") + 1).trim();
 
+    console.log(
+      `Sending message '${targetMessage}' from ${proxyPhoneNumber} to ${targetPhoneNumber}.`
+    );
+
     client.messages
       .create({
         body: targetMessage,
@@ -45,30 +51,33 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
         to: targetPhoneNumber,
       })
       .then(() => {
+        console.log("Message sent.");
         twiml.message("Message sent");
         return callback(null, twiml);
       })
       .catch((error) => {
-        // We want this message logged to the Twilio Console.
-        // eslint-disable-next-line no-console
-        console.error(error);
+        console.error(`Error dispatching message: ${error}`);
         twiml.message(
           "An error occurred sending your message. Check the Twilio Console for more details."
         );
         return callback(error, twiml);
       });
   } else {
+    console.log(`Received message from ${event.From}: ${event.Body}.`);
     client.messages
       .create({
         body: `SMS from: ${event.From}, Body: ${event.Body}`,
         from: proxyPhoneNumber,
         to: privatePhoneNumber,
       })
-      .then(() => callback(null))
+      .then(() => {
+        console.log(`Message forwarded to ${privatePhoneNumber}.`);
+        return callback(null);
+      })
       .catch((error) => {
-        // We want this message logged to the Twilio Console.
-        // eslint-disable-next-line no-console
-        console.error(error);
+        console.error(
+          `Error forwarding message onto ${privatePhoneNumber}: ${error}`
+        );
         return callback(error);
       });
   }
