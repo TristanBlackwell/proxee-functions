@@ -6,7 +6,7 @@ interface Event {
   From: string;
 }
 
-export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
+export const handler: ServerlessFunctionSignature<BaseContext, Event> = async (
   context,
   event,
   callback
@@ -44,43 +44,48 @@ export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
       `Sending message '${targetMessage}' from ${proxyPhoneNumber} to ${targetPhoneNumber}.`
     );
 
-    client.messages
-      .create({
+    try {
+      const message = await client.messages.create({
         body: targetMessage,
         from: proxyPhoneNumber,
         to: targetPhoneNumber,
-      })
-      .then(() => {
-        console.log("Message sent.");
-        twiml.message("Message sent");
-        return callback(null, twiml);
-      })
-      .catch((error) => {
-        console.error(`Error dispatching message: ${error}`);
-        twiml.message(
-          "An error occurred sending your message. Check the Twilio Console for more details."
-        );
-        return callback(error, twiml);
       });
+
+      console.log(`Message sent with SID: ${message.sid}.`);
+      twiml.message("Message sent");
+      return callback(null, twiml);
+    } catch (error) {
+      console.error(`Error dispatching message: ${error}`);
+      twiml.message(
+        "An error occurred sending your message. Check the Twilio Console for more details."
+      );
+      if (error instanceof Error) {
+        return callback(error, twiml);
+      }
+      return callback(null, twiml);
+    }
   } else {
     console.log(`Received message from ${event.From}: ${event.Body}.`);
-    client.messages
-      .create({
+    try {
+      const message = await client.messages.create({
         body: `SMS from: ${event.From}, Body: ${event.Body}`,
         from: proxyPhoneNumber,
         to: privatePhoneNumber,
-      })
-      .then(() => {
-        console.log(`Message forwarded to ${privatePhoneNumber}.`);
-        return callback(null);
-      })
-      .catch((error) => {
-        console.error(
-          `Error forwarding message onto ${privatePhoneNumber}: ${error}`
-        );
-        return callback(error);
       });
-  }
 
-  return callback(null);
+      console.log(
+        `Message forwarded to ${privatePhoneNumber} with SID ${message.sid}.`
+      );
+      return callback(null);
+    } catch (error) {
+      console.error(
+        `Error forwarding message onto ${privatePhoneNumber}: ${error}`
+      );
+      if (error instanceof Error) {
+        return callback(error);
+      }
+
+      return callback(null);
+    }
+  }
 };
