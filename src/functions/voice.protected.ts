@@ -5,7 +5,7 @@ interface Event {
   From: string;
 }
 
-export const handler: ServerlessFunctionSignature<BaseContext, Event> = (
+export const handler: ServerlessFunctionSignature<BaseContext, Event> = async (
   context,
   event,
   callback
